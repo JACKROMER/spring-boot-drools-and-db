@@ -74,8 +74,6 @@ public class Rule implements Serializable {
 		this.createTime = createTime;
 	}
 
-
-
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

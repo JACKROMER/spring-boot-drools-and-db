@@ -22,9 +22,9 @@ public class TestController {
 
     @ResponseBody
     @RequestMapping("/address")
-    public void test(int num){
+    public void test(){
         Address address = new Address();
-        address.setPostcode(generateRandom(num));
+        address.setPostcode(generateRandom(10));
         KieSession kieSession = ReloadDroolsRulesService.kieContainer.newKieSession();
 
         AddressCheckResult result = new AddressCheckResult();
@@ -65,6 +65,6 @@ public class TestController {
             int rand = (int) (Math.random() * 10);
             number=number.append(chars.charAt(rand));
         }
-        return "hahaha";
+        return "hello";
     }
 }

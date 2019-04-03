@@ -1,6 +1,8 @@
 package com.neo.drools.config;
 
 import com.neo.drools.service.ReloadDroolsRulesService;
+
+import org.drools.core.io.impl.ClassPathResource;
 import org.kie.api.KieBase;
 import org.kie.api.KieServices;
 import org.kie.api.builder.*;
@@ -27,7 +29,8 @@ public class DroolsAutoConfiguration {
     @ConditionalOnMissingBean(KieFileSystem.class)
     public KieFileSystem kieFileSystem() throws IOException {
         KieFileSystem kieFileSystem = getKieServices().newKieFileSystem();
-        for (Resource file : getRuleFiles()) {
+        Resource [] resourceArray = getRuleFiles();//获取文件并加载
+        for (Resource file : resourceArray) {
             kieFileSystem.write(ResourceFactory.newClassPathResource(RULES_PATH + file.getFilename(), "UTF-8"));
         }
         return kieFileSystem;
@@ -35,7 +38,7 @@ public class DroolsAutoConfiguration {
 
     private Resource[] getRuleFiles() throws IOException {
         ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-        return resourcePatternResolver.getResources("classpath*:" + RULES_PATH + "**/*.*");
+        return resourcePatternResolver.getResources(RULES_PATH + "**/*.drl");
     }
     
     @Bean
@@ -49,12 +52,13 @@ public class DroolsAutoConfiguration {
             }
         });
         
-        KieBuilder kieBuilder = getKieServices().newKieBuilder(kieFileSystem());
+        KieFileSystem kieFileSystem = kieFileSystem();
+        KieBuilder kieBuilder = getKieServices().newKieBuilder(kieFileSystem);
         kieBuilder.buildAll();
 
         KieContainer kieContainer=getKieServices().newKieContainer(kieRepository.getDefaultReleaseId());
 
-        ReloadDroolsRulesService.kieContainer=kieContainer;
+        ReloadDroolsRulesService.kieContainer = kieContainer;
         
         return kieContainer;
     }
